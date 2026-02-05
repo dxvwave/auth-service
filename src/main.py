@@ -7,6 +7,7 @@ from fastapi import FastAPI
 
 from interfaces.grpc.auth_server import AuthService
 from interfaces.grpc.gen import auth_pb2_grpc
+from interfaces.api.auth_routes import router as auth_router
 
 
 @asynccontextmanager
@@ -24,6 +25,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(auth_router)
 
 
 if __name__ == "__main__":
