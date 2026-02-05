@@ -8,6 +8,7 @@ from core.security import (
     verify_password,
     create_access_token,
     get_password_hash,
+    decode_token,
 )
 
 
@@ -66,6 +67,17 @@ class AuthService:
 
         access_token = create_access_token(payload=payload)
         return TokenSchema(access_token=access_token)
+    
+    async def validate_token_and_user(self, token: str, session: AsyncSession) -> bool:
+        try:
+            payload = decode_token(token)
+            user_id = payload.get("user_id")
+            if not user_id:
+                return False
+            user = await session.scalar(select(User).where(User.id == user_id))
+            return user is not None
+        except Exception:
+            return False
 
 
 auth_service_instance = AuthService()
