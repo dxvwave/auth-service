@@ -8,6 +8,7 @@ dependencies = [
     "alembic>=1.18.3",
     "asyncpg>=0.31.0",
     "bcrypt==4.3.0",
+    "contracts",
     "fastapi[standard]>=0.128.1",
     "grpcio>=1.76.0",
     "passlib[bcrypt]>=1.7.4",
@@ -21,3 +22,6 @@ dependencies = [
 dev = [
     "black>=26.1.0",
 ]
+
+[tool.uv.sources]
+contracts = { git = "https://github.com/dxvwave/contracts.git" }

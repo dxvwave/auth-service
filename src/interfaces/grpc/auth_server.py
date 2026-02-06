@@ -1,6 +1,6 @@
 from db import db_session_manager
 from services.auth.auth_service import auth_service_instance
-from interfaces.grpc.gen import auth_pb2, auth_pb2_grpc
+from contracts.gen import auth_pb2, auth_pb2_grpc
 
 
 class AuthService(auth_pb2_grpc.AuthServiceServicer):

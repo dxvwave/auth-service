@@ -5,8 +5,8 @@ import uvicorn
 import grpc
 from fastapi import FastAPI
 
+from contracts.gen import auth_pb2_grpc
 from interfaces.grpc.auth_server import AuthService
-from interfaces.grpc.gen import auth_pb2_grpc
 from interfaces.api.auth_routes import router as auth_router
 
 
