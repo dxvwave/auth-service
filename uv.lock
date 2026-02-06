@@ -98,7 +98,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.18.3" },
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "bcrypt", specifier = "==4.3.0" },
-    { name = "contracts", git = "https://github.com/dxvwave/contracts.git" },
+    { name = "contracts", git = "https://github.com/dxvwave/contracts.git?rev=0.1.1" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.128.1" },
     { name = "grpcio", specifier = ">=1.76.0" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
@@ -201,8 +201,8 @@ wheels = [
 
 [[package]]
 name = "contracts"
-version = "0.1.0"
-source = { git = "https://github.com/dxvwave/contracts.git#1bde467404b455da3441b106ba58b8ea0611fe94" }
+version = "0.1.1"
+source = { git = "https://github.com/dxvwave/contracts.git?rev=0.1.1#414703bcdeb69a7b86769de2e73ab6e38ab8baa0" }
 dependencies = [
     { name = "grpcio" },
     { name = "grpcio-tools" },

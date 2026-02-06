@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from contracts.gen import auth_pb2_grpc
 from interfaces.grpc.auth_server import AuthService
 from interfaces.api.auth_routes import router as auth_router
+from interfaces.api.user_routes import router as user_router
 
 
 @asynccontextmanager
@@ -26,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
-
+app.include_router(user_router)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

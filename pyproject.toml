@@ -24,4 +24,4 @@ dev = [
 ]
 
 [tool.uv.sources]
-contracts = { git = "https://github.com/dxvwave/contracts.git" }
+contracts = { git = "https://github.com/dxvwave/contracts.git", rev = "0.1.1" }
