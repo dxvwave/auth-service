@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.dependencies import get_auth_service
 from core.schemas.user import (
-    UserCreateSchema,
-    UserLoginSchema,
-    UserSchema,
-    TokenSchema,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+    TokenResponse,
 )
 from services.auth import AuthService
 from db import db_session_manager
@@ -14,9 +14,9 @@ from db import db_session_manager
 router = APIRouter()
 
 
-@router.post("/login", response_model=TokenSchema)
+@router.post("/login", response_model=TokenResponse)
 async def login(
-    user_data: UserLoginSchema,
+    user_data: UserLogin,
     auth_service: AuthService = Depends(get_auth_service),
     session: AsyncSession = Depends(db_session_manager.get_async_session),
 ):
@@ -30,14 +30,14 @@ async def login(
         raise HTTPException(status_code=401, detail=str(e))
 
 
-@router.post("/register", response_model=UserSchema)
+@router.post("/register", response_model=UserResponse)
 async def register(
-    user_data: UserCreateSchema,
+    user_data: UserCreate,
     auth_service: AuthService = Depends(get_auth_service),
     session: AsyncSession = Depends(db_session_manager.get_async_session),
 ):
     try:
         user = await auth_service.register_user(user_data, session)
-        return UserSchema(**user.__dict__)
+        return UserResponse(**user.__dict__)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))

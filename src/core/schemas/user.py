@@ -1,29 +1,29 @@
 from pydantic import BaseModel, EmailStr
 
 
-class UserBaseSchema(BaseModel):
+class UserBase(BaseModel):
     first_name: str
     last_name: str
     username: str
     email: EmailStr
 
 
-class UserLoginSchema(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
 
-class UserCreateSchema(UserBaseSchema):
+class UserCreate(UserBase):
     password: str
 
 
-class UserSchema(UserBaseSchema):
+class UserResponse(UserBase):
     id: int
     is_active: bool | None
     is_superuser: bool | None
     is_verified: bool | None
 
 
-class TokenSchema(BaseModel):
+class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

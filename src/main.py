@@ -6,7 +6,7 @@ import grpc
 from fastapi import FastAPI
 
 from contracts.gen import auth_pb2_grpc
-from interfaces.grpc.auth_server import AuthService
+from interfaces.grpc.auth_server import AuthGrpcServicer
 from interfaces.api.auth_routes import router as auth_router
 from interfaces.api.user_routes import router as user_router
 
@@ -14,7 +14,7 @@ from interfaces.api.user_routes import router as user_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     grpc_server = grpc.aio.server()
-    auth_pb2_grpc.add_AuthServiceServicer_to_server(AuthService(), grpc_server)
+    auth_pb2_grpc.add_AuthServiceServicer_to_server(AuthGrpcServicer(), grpc_server)
     grpc_server.add_insecure_port("[::]:50051")
     await grpc_server.start()
     logging.info("gRPC server started via Lifespan")

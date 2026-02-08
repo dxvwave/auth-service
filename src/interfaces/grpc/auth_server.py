@@ -5,7 +5,7 @@ from core.utils import provide_session
 from services.auth.auth_service import auth_service_instance
 
 
-class AuthService(auth_pb2_grpc.AuthServiceServicer):
+class AuthGrpcServicer(auth_pb2_grpc.AuthServiceServicer):
     @provide_session
     async def ValidateToken(self, request, context, session):
         user = await auth_service_instance.validate_token_and_user(
