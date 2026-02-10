@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
-from core.schemas.user import UserCreateSchema, TokenSchema
+from core.schemas.user import UserCreate, TokenResponse
 from core.security import (
     verify_password,
     create_access_token,
@@ -29,7 +29,7 @@ class AuthService:
 
     async def register_user(
         self,
-        user_data: UserCreateSchema,
+        user_data: UserCreate,
         session: AsyncSession,
     ) -> User:
         if await self.get_user_by_email(session, user_data.email):
@@ -68,7 +68,7 @@ class AuthService:
         }
 
         access_token = create_access_token(payload=payload)
-        return TokenSchema(access_token=access_token)
+        return TokenResponse(access_token=access_token)
 
     async def validate_token_and_user(
         self,

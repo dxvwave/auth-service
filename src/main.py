@@ -1,9 +1,9 @@
 import logging
 
-from fastapi.concurrency import asynccontextmanager
 import uvicorn
 import grpc
 from fastapi import FastAPI
+from fastapi.concurrency import asynccontextmanager
 
 from contracts.gen import auth_pb2_grpc
 from interfaces.grpc.auth_server import AuthGrpcServicer
@@ -18,9 +18,9 @@ async def lifespan(app: FastAPI):
     grpc_server.add_insecure_port("[::]:50051")
     await grpc_server.start()
     logging.info("gRPC server started via Lifespan")
-    
+
     yield
-    
+
     await grpc_server.stop(5)
     logging.info("gRPC server stopped")
 

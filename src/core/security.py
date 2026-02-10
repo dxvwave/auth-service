@@ -1,3 +1,4 @@
+import uuid
 import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -8,6 +9,7 @@ from core.config import settings
 SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = settings.jwt_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.jwt_access_token_expire_minutes
+REFRESH_TOKEN_EXPIRE_DAYS = settings.jwt_refresh_token_expire_days
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -29,6 +31,29 @@ def create_access_token(
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(
+        to_encode,
+        SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
+    return encoded_jwt
+
+
+def create_refresh_token(
+    payload: dict,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    to_encode = payload.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(timezone.utc),
+            "jti": str(uuid.uuid4()),
+        }
+    )
     encoded_jwt = jwt.encode(
         to_encode,
         SECRET_KEY,
