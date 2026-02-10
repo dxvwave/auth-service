@@ -30,7 +30,14 @@ def create_access_token(
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    to_encode.update({"exp": expire})
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(timezone.utc),
+            "jti": str(uuid.uuid4()),
+            "type": "access",
+        }
+    )
     encoded_jwt = jwt.encode(
         to_encode,
         SECRET_KEY,
@@ -52,6 +59,7 @@ def create_refresh_token(
             "exp": expire,
             "iat": datetime.now(timezone.utc),
             "jti": str(uuid.uuid4()),
+            "type": "refresh",
         }
     )
     encoded_jwt = jwt.encode(

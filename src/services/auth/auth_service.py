@@ -7,6 +7,7 @@ from core.schemas.user import UserCreate, TokenResponse
 from core.security import (
     verify_password,
     create_access_token,
+    create_refresh_token,
     get_password_hash,
     decode_token,
 )
@@ -67,8 +68,38 @@ class AuthService:
             "email": user.email,
         }
 
-        access_token = create_access_token(payload=payload)
-        return TokenResponse(access_token=access_token)
+        return TokenResponse(
+            access_token=create_access_token(payload=payload),
+            refresh_token=create_refresh_token(payload=payload),
+        )
+    
+    async def refresh_access_token(
+        self,
+        refresh_token: str,
+        session: AsyncSession,
+    ) -> TokenResponse:
+        try:
+            payload = decode_token(refresh_token)
+            if payload.get("type") != "refresh":
+                raise ValueError("Invalid refresh token")
+            
+            if not (user_id := payload.get("sub")):
+                raise ValueError("Invalid refresh token")
+
+            user = await self.get_user_by_id(session, int(user_id))
+            if not user:
+                raise ValueError("User not found")
+
+            payload = {
+                "sub": str(user.id),
+                "email": user.email,
+            }
+
+            return TokenResponse(
+                access_token=create_access_token(payload=payload),
+            )
+        except Exception as e:
+            raise ValueError("Invalid refresh token") from e
 
     async def validate_token_and_user(
         self,
@@ -77,8 +108,10 @@ class AuthService:
     ) -> User | None:
         try:
             payload = decode_token(token)
-            user_id = payload.get("sub")
-            if not user_id:
+            if payload.get("type") != "access":
+                return None
+            
+            if not (user_id := payload.get("sub")):
                 return None
             return await self.get_user_by_id(session, int(user_id))
         except Exception:

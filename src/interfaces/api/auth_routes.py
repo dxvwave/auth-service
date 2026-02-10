@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.dependencies import get_auth_service
@@ -39,5 +39,17 @@ async def register(
     try:
         user = await auth_service.register_user(user_data, session)
         return UserResponse(**user.__dict__)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(
+    refresh_token: str = Body(...),
+    auth_service: AuthService = Depends(get_auth_service),
+    session: AsyncSession = Depends(db_session_manager.get_async_session),
+):
+    try:
+        return await auth_service.refresh_access_token(refresh_token, session)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
