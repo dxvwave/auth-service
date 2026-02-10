@@ -1,25 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer
-from sqlalchemy.ext.asyncio import AsyncSession
+import logging
+from fastapi import APIRouter, Depends
 
-from core.dependencies import get_auth_service
+from core.dependencies import get_current_active_user
 from core.schemas.user import UserResponse
-from services.auth import AuthService
-from db import db_session_manager
+from db.models import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-http_bearer = HTTPBearer()
 
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
-    token: str = Depends(http_bearer),
-    auth_service: AuthService = Depends(get_auth_service),
-    session: AsyncSession = Depends(db_session_manager.get_async_session),
+    current_user: User = Depends(get_current_active_user),
 ):
-    token = token.credentials
-    user = await auth_service.validate_token_and_user(token, session)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return UserResponse(**user.__dict__)
+    return UserResponse(**current_user.__dict__)

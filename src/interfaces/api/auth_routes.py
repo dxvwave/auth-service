@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,8 +9,17 @@ from core.schemas.user import (
     UserResponse,
     TokenResponse,
 )
-from services.auth import AuthService
+from core.exceptions import (
+    UserAlreadyExistsError,
+    InvalidCredentialsError,
+    InvalidTokenError,
+    TokenExpiredError,
+    UserNotFoundError,
+)
+from services.auth_service import AuthService
 from db import db_session_manager
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -26,7 +36,8 @@ async def login(
             user_data.password,
             session,
         )
-    except ValueError as e:
+    except InvalidCredentialsError as e:
+        logger.warning(f"Login failed for {user_data.email}: {str(e)}")
         raise HTTPException(status_code=401, detail=str(e))
 
 
@@ -39,17 +50,20 @@ async def register(
     try:
         user = await auth_service.register_user(user_data, session)
         return UserResponse(**user.__dict__)
-    except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
-    
+    except UserAlreadyExistsError as e:
+        logger.warning(f"Registration failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(
-    refresh_token: str = Body(...),
+    refresh_token: str = Body(..., embed=True),
     auth_service: AuthService = Depends(get_auth_service),
     session: AsyncSession = Depends(db_session_manager.get_async_session),
 ):
     try:
         return await auth_service.refresh_access_token(refresh_token, session)
-    except ValueError as e:
+    except (InvalidTokenError, TokenExpiredError, UserNotFoundError) as e:
+        logger.warning(f"Token refresh failed: {str(e)}")
         raise HTTPException(status_code=401, detail=str(e))
+
