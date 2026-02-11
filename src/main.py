@@ -40,11 +40,12 @@ app = FastAPI(
     title="Auth Service",
     description="Authentication and Authorization Service for Microservices",
     version="0.1.0",
+    root_path="/api/v1/auth",
     lifespan=lifespan,
 )
 
 # Include routers with tags
-app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth_router, tags=["Authentication"])
 app.include_router(user_router, prefix="/users", tags=["Users"])
 
 
