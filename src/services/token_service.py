@@ -114,7 +114,7 @@ class TokenService:
             logger.debug(f"Token expired: {str(e)}")
             raise TokenExpiredError("Token has expired") from e
         except jwt.InvalidTokenError as e:
-            logger.warning(f"Invalid token: {str(e)}")
+            logger.error(f"Invalid token: {str(e)}")
             raise InvalidTokenError("Invalid token") from e
 
     def create_token_pair(self, payload: dict) -> tuple[str, str]:

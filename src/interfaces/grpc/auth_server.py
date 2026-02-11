@@ -1,6 +1,7 @@
 import grpc
 from contracts.gen import auth_pb2, auth_pb2_grpc
 
+from core.exceptions import InvalidTokenError
 from core.utils import provide_session
 from services.auth_service import auth_service
 
@@ -8,10 +9,14 @@ from services.auth_service import auth_service
 class AuthGrpcServicer(auth_pb2_grpc.AuthServiceServicer):
     @provide_session
     async def ValidateToken(self, request, context, session):
-        user = await auth_service.validate_token_and_user(
-            request.token,
-            session,
-        )
+        try:
+            user = await auth_service.get_user_from_token(
+                request.token,
+                session,
+            )
+        except InvalidTokenError:
+            await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Invalid token")
+            
         if not user:
             await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Invalid token")
 
